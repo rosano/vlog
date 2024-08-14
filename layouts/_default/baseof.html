@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="icon" href="https://static.rosano.ca/rcreativ/touch.png" type="image/png">
+
+{{ .Scratch.Set "kIsTitle" "true" }}
+<title>{{- partial "page-title.html" . -}}</title>
+{{ .Scratch.Delete "kIsTitle" }}
+
+{{ $options := (dict "outputStyle" "compressed" "enableSourceMap" true) }}
+{{ $style := resources.Get "css/_gather.scss" | resources.ToCSS $options }}
+<link rel="stylesheet" href="{{ $style.Permalink }}" />
+{{ if not (and (eq .Kind "term") (or (eq .Data.Singular "year") (eq .Data.Singular "month") (eq .Data.Singular "day"))) }}
+	{{ range .AlternativeOutputFormats -}}
+	  <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{- partial "page-title.html" page -}}">
+	{{ end }}
+{{ end }}
+
+</head>
+<body>
+
+<header>
+	<h2>
+		<a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a>
+	</h2>
+</header>
+
+{{- block "main" . }}{{- end }}
+
+<footer>
+
+{{- block "404-start" . }}{{- end }}
+{{ if (and .Paginator (ne .Paginator.TotalPages 0) (ne (.Scratch.Get "k404") "yes")) }}
+	
+<div class="paginator">
+	<span>
+		{{ if .Paginator.HasNext }}
+			<a href="{{ .Paginator.Next.URL }}">older</a> · 
+			<small><a href="{{ .Paginator.Last.URL }}">start</a></small>
+		{{ end }}
+	</span>
+	<span>
+		{{ if .Paginator.HasPrev }}
+			<small><a href="{{ .Paginator.First.URL }}">end</a></small> · 
+			<a href="{{ .Paginator.Prev.URL }}">newer</a>
+		{{ end }}
+	</span>
+</div>
+
+{{ end }}
+{{- block "404-end" . }}{{- end }}
+
+</footer>
+
+{{- partial "media-embeds.html" . -}}
+
+</body>
+</html>

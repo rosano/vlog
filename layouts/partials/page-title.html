@@ -1,0 +1,15 @@
+{{- if (eq .Kind "term") }}{{ if ne (.Scratch.Get "kIsTitle") "true" }}{{ .Pages | len }}{{ end }} entries {{ cond (eq .Data.Plural "categories") "under" (cond (eq .Data.Plural "tags") "tagged" "for") }} {{ end }}
+
+{{- if (and (eq .Kind "term") (eq .Data.Singular "day")) }}
+	{{ $t := time.AsTime .Data.Term }}
+	{{ time.Format "Monday, January 2, 2006" $t }}
+{{ else if (and (eq .Kind "term") (eq .Data.Singular "month")) }}
+	{{ $t := time.AsTime (delimit (slice .Data.Term "01") "-") }}
+	{{ time.Format "January 2006" $t }}
+{{ else if (or (eq .Data.Plural "categories") (eq .Data.Plural "tags")) -}}
+	"{{- .Title -}}"
+{{ else if eq .Section "posts" }}
+	entry for {{ .Date.Format "Monday, January 2, 2006" -}}
+{{- else }}
+	{{- .Title -}}
+{{ end -}}

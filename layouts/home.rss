@@ -1,0 +1,49 @@
+{{ define "main" }}
+
+{{- $pages := .Scratch.Get "rss-pages" }}
+{{- $pages := $pages.GroupByPublishDate "2006-01-02" "desc" | first .Site.Config.Services.RSS.Limit }}
+
+{{/* exclude today from home feed */}}
+{{- $pages := where $pages "Key" "ne" (time.Now.Format "2006-01-02") }}
+
+{{ range $pages }}
+{{ $t := time.AsTime (delimit (slice .Key "T" "12:00:00Z") "") }}
+{{ $date := time.Format "2006/01/02/" $t }}
+<item>
+
+<title>{{ time.Format "Monday, January 2, 2006" $t }}</title>
+<link>{{ site.BaseURL }}{{ $date }}</link>
+<pubDate>{{ time.Format "Mon, 02 Jan 2006 15:04:05 -0700" $t | safeHTML }}</pubDate>
+<guid>{{ site.BaseURL }}{{ $date }}</guid>
+
+{{ $tags := (slice) }}
+{{ $categories := (slice) }}
+{{ range .Pages }}
+  {{ if .Params.categories }}
+    {{ $categories = $categories | append .Params.categories | uniq }}
+  {{ end }}
+
+  {{ if .Params.tags }}
+    {{ $tags = $tags | append .Params.tags | uniq }}
+  {{ end }}
+{{ end }}
+<description>{{ .Pages.Len }} {{ cond (gt .Pages.Len 1) "entries" "entry" }}{{ with $categories }} under {{ delimit $categories ", " }}{{ end }}{{ with $tags }}; tagged: {{ delimit $tags ", " }}{{ end }}</description>
+
+<content:encoded>{{ printf "<![CDATA[" | safeHTML }}
+{{ range $index, $element := .Pages }}
+
+{{ if $index }}<hr />{{ end }}
+
+{{ .Scratch.Set "kScope" "kScopeList" }}
+{{ .Scratch.Set "kScopeRSS" "true" }}
+{{- partial "items-singular.html" . -}}
+{{ .Scratch.Delete "kScopeRSS" }}
+{{ .Scratch.Delete "kScope" }}
+
+{{ end }}
+{{- printf "]]>" | safeHTML }}</content:encoded>
+
+</item>
+{{- end }}
+
+{{ end }}

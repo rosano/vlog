@@ -1,0 +1,46 @@
+baseURL: https://vlog.rosano.ca/
+languageCode: en-ca
+title: vlog
+canonifyURLs: true
+
+paginate: 20
+
+taxonomies:
+  category: categories
+  tag: tags
+  year: year
+  month: month
+  day: day
+  place: place
+  country: country
+  series: series
+  guests: guests
+
+disableKinds:
+- taxonomy
+
+permalinks:
+  page:
+    posts: /:slugorfilename/
+  term:
+    categories: /type/:slug/
+    tags: /tag/:slug/
+    place: /place/:slug/
+    country: /country/:slug/
+    year: /:year/
+    month: /:year/:month/
+    day: /:year/:month/:day/
+    guests: /guest/:slug/
+
+services:
+  rss:
+    limit: 90
+
+mediaTypes:
+  application/rss:
+    suffix: ""
+    delimiter: ""
+outputFormats:
+  RSS:
+    mediatype: "application/rss"
+    baseName: "feed"

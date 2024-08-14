@@ -1,0 +1,11 @@
+{{ define "main" }}
+
+<h1>{{- partial "page-title" . -}}</h1>
+
+{{ if ne .Ancestors.Len 1 }}
+
+{{- partial "items-plural" . -}}
+
+{{ end }}
+
+{{ end }}
